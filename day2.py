@@ -1,31 +1,57 @@
+import math
 data = []
 with open('./day2.txt', 'r') as file:
     l = file.readline().strip()
     data = [(val.split('-')[0], val.split('-')[1]) for val in l.split(',')]
 
 
-def check(val, i, j):
-    if j >= len(val):
-        return True
-    return val[i] == val[j] and check(val, i+1, j+1)
+def divisori(num):
+    divisors = []
+    for i in range(1, int(math.sqrt(num)) + 1):
+        if num % i == 0:       # If 'i' is a divisor of 'num'
+            divisors.append(i)  # Add 'i' to the list of divisors
+            if i != num // i:
+                divisors.append(num // i)
+    return divisors[1:]
 
 
-def eval(val):
-    if len(val) % 2 == 0:
-        return check(val, 0, int(len(val)/2))
-    return check(val, 0, int(len(val)/2)-1)
+def pattern(p, start, end, size):
+    print(p)
+    val = int(p*size)
+    if end < val:
+        return []
+    if start > val:
+        return [] + pattern(p+1, start, end, size)
+    return [p] + pattern(p+1, start, end, size)
 
 
-def rg():
+def genErrors(start, end):
+    res = []
+    if len(start) == 1 and len(end) == 1:
+        return []
+
+    while len(start) != len(end):
+        start = '0'+start
+    div = divisori(int(start))
+    if len(div) == 0:
+        return []
+    for d in div:
+        p = pattern(start[:d], int(start), int(end), int(len(start)/d))
+        res.append(p)
+    return res
+
+
+def run():
     pw = 0
-    for val in data:
-        start, end = val
-        for n in range(int(start), int(end)):
-            if len(str(n)) == 1:
-                continue
-            if not eval(str(n)):
-                pw += n
+    for (start, end) in data:
+        print(f"start: {start}, end: {end}")
+        err = genErrors(start, end)
+        print(f"errors: {err}")
+        for i in err:
+            pw += int(i)
+        print()
+
     print(pw)
 
 
-rg()
+run()
