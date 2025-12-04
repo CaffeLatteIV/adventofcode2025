@@ -17,7 +17,6 @@ def divisori(num):
 
 def pattern(p, start, end, size):
     val = int(str(p)*size)
-    print(f"p {p} val {val} end {end} size {size}")
     p = int(p)
     if end < val:
         return []
@@ -31,16 +30,25 @@ def genErrors(start, end):
     if len(start) == 1 and len(end) == 1:
         return []
 
-    while len(start) != len(end):
-        start = '0'+start
-    div = divisori(len(start))
-    if len(div) == 0:
+    dstart = divisori(len(start))
+    dend = divisori(len(end))
+    if len(dstart) == 0:
         return []
-    for d in div:
+    for d in dstart:
         if d == len(start):
             continue
         p = pattern(start[:d], int(start), int(end), int(len(start)/d))
-        res.append(p)
+        print(p)
+        res += p
+    if len(start) != len(end):
+        start = '1'+'0'*(len(end)-1)
+        for d in dend:
+            if d == len(end):
+                continue
+            p = pattern(start[:d], int(start), int(end), int(len(start)/d))
+            print(p)
+            res += p
+
     return res
 
 
@@ -48,7 +56,7 @@ def run():
     pw = 0
     for (start, end) in data:
         print(f"start: {start}, end: {end}")
-        err = genErrors(start, end)
+        err = set(genErrors(start, end))
         print(f"errors: {err}")
         for i in err:
             pw += int(i)
